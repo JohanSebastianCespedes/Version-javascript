@@ -1,6 +1,4 @@
-
-// 1. CARGA DINÁMICA DE LIBRERÍAS EXTERNAS (CDNs)
-
+// 1. CARGA DINÁMICA DE LIBRERÍAS EXTERNAS (Chart.js y ECharts)
 function loadScript(src) {
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
@@ -20,50 +18,21 @@ Promise.all([
   console.error("Error al cargar las librerías:", err);
 });
 
-// ==========================================
-// 2. CONFIGURACIÓN DE DATOS Y VARIABLES
-// ==========================================
+// 2. DATOS
 const realPrices = {
-  BTC: 81102,
-  ETH: 3450,
-  SOL: 145,
-  XRP: 1.40,
-  DOGE: 0.087,
-  LINK: 12.31,
-  XLM: 0.193,
-  BCH: 253.58,
-  LTC: 56.96,
-  SHIB: 0.0000054
+  BTC: 81102, ETH: 3450, SOL: 145, XRP: 1.40, DOGE: 0.087, LINK: 12.31, XLM: 0.193, BCH: 253.58, LTC: 56.96, SHIB: 0.0000054
 };
 
 const cryptoData = {
-  btc: {
-    label: 'Precio Bitcoin (BTC) - USD',
-    data: [65000, 68000, 72000, 70000, 75000, 78000, 76300, 81102],
-    borderColor: '#f0b90b',
-    backgroundColor: 'rgba(240, 185, 11, 0.1)'
-  },
-  eth: {
-    label: 'Precio Ethereum (ETH) - USD',
-    data: [2800, 3100, 3500, 3200, 3400, 3600, 3300, 3450],
-    borderColor: '#627eea',
-    backgroundColor: 'rgba(98, 126, 234, 0.1)'
-  },
-  sol: {
-    label: 'Precio Solana (SOL) - USD',
-    data: [110, 130, 160, 140, 155, 150, 138, 145],
-    borderColor: '#14f195',
-    backgroundColor: 'rgba(20, 241, 149, 0.1)'
-  }
+  btc: { label: 'Precio Bitcoin (BTC) - USD', data: [65000, 68000, 72000, 70000, 75000, 78000, 76300, 81102], borderColor: '#f0b90b', backgroundColor: 'rgba(240, 185, 11, 0.1)' },
+  eth: { label: 'Precio Ethereum (ETH) - USD', data: [2800, 3100, 3500, 3200, 3400, 3600, 3300, 3450], borderColor: '#627eea', backgroundColor: 'rgba(98, 126, 234, 0.1)' },
+  sol: { label: 'Precio Solana (SOL) - USD', data: [110, 130, 160, 140, 155, 150, 138, 145], borderColor: '#14f195', backgroundColor: 'rgba(20, 241, 149, 0.1)' }
 };
 
 let currentChart = null;
 
-// ==========================================
-// 3. INYECCIÓN DE ESTILOS Y ESTRUCTURA DOM
-// ==========================================
+// 3. GENERACIÓN DEL DISEÑO Y ESTILOS MEDIANTE JAVASCRIPT
 function initDashboard() {
-  // Inyectar Estilos CSS
   const styleTag = document.createElement('style');
   styleTag.textContent = `
     :root {
@@ -76,71 +45,54 @@ function initDashboard() {
       --accent-red: #f6465d;
       --accent-gold: #f0b90b;
     }
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      line-height: 1.6;
-      padding: 30px;
-      max-width: 950px;
-      margin: 0 auto;
-    }
-    h1 {
-      font-size: 2.2rem;
-      border-bottom: 2px solid var(--border-color);
-      padding-bottom: 12px;
-      background: linear-gradient(90deg, #f0b90b, #58a6ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+    body { background-color: var(--bg-color); color: var(--text-color); font-family: sans-serif; line-height: 1.6; padding: 30px; max-width: 950px; margin: 0 auto; }
+    h1 { font-size: 2.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; background: linear-gradient(90deg, #f0b90b, #58a6ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     h2 { font-size: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-top: 30px; color: #fff; }
     h3 { font-size: 1.2rem; margin-top: 20px; color: #fff; }
-    hr { border: 0; height: 1px; background: linear-gradient(90deg, rgba(48,54,61,0), rgba(48,54,61,1), rgba(48,54,61,0)); margin: 30px 0; }
+    hr { border: 0; height: 1px; background: #30363d; margin: 30px 0; }
     a { color: var(--link-color); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .img-banner { width: 100%; height: auto; max-height: 450px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); margin: 15px 0; }
-    .section-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-    .btn-container { display: flex; gap: 15px; margin: 20px 0; flex-wrap: wrap; }
-    .btn { padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.95rem; }
+    .img-banner { width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); margin: 15px 0; display: block; }
+    .section-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin: 20px 0; }
+    .btn-container { display: flex; gap: 15px; margin: 20px 0; }
+    .btn { padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
     .btn-buy { background-color: var(--accent-green); color: #000; }
     .btn-sell { background-color: var(--accent-red); color: #fff; }
     .btn-gold { background-color: var(--accent-gold); color: #000; }
-    table { width: 100%; border-collapse: collapse; margin: 20px 0; border-radius: 8px; overflow: hidden; }
-    th, td { border: 1px solid var(--border-color); padding: 12px 15px; text-align: left; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
     th { background-color: #21262d; color: var(--accent-gold); }
     .crypto-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
     .tab-btn { padding: 8px 18px; background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 6px; cursor: pointer; font-weight: bold; }
     .tab-btn.active { border-color: var(--accent-gold); background-color: #21262d; color: var(--accent-gold); }
-    .gauge-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-    .gauge-box { height: 320px; }
+    .gauge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .gauge-box { height: 300px; }
     #chat-widget-button { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #f0b90b, #0ecb81); border: none; font-size: 28px; cursor: pointer; z-index: 1000; }
-    #chat-box-container { position: fixed; bottom: 95px; right: 25px; width: 360px; height: 480px; background-color: #161b22; border: 1px solid #30363d; border-radius: 12px; z-index: 1000; display: none; flex-direction: column; overflow: hidden; }
-    .chat-header { background-color: #21262d; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; }
+    #chat-box-container { position: fixed; bottom: 95px; right: 25px; width: 350px; height: 450px; background-color: #161b22; border: 1px solid #30363d; border-radius: 12px; z-index: 1000; display: none; flex-direction: column; overflow: hidden; }
+    .chat-header { background-color: #21262d; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; }
     .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
     .message { max-width: 85%; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; }
     .message.bot { background-color: #21262d; color: #c9d1d9; align-self: flex-start; }
     .message.user { background-color: #1f6beb; color: #ffffff; align-self: flex-end; }
     .chat-input-area { display: flex; padding: 10px; border-top: 1px solid #30363d; background-color: #0d1117; }
-    .chat-input-area input { flex: 1; background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 8px 12px; color: #fff; outline: none; }
+    .chat-input-area input { flex: 1; background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 8px; color: #fff; outline: none; }
     .chat-input-area button { background-color: #f0b90b; border: none; color: #000; padding: 8px 14px; margin-left: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; }
   `;
   document.head.appendChild(styleTag);
 
-  // Construir HTML mediante JavaScript
   document.body.innerHTML = `
-    <h1>🪙 Sebastián | Cripto Trading & Análisis de Mercados Digitales 📈</h1>
+    <h1>🪙 Johan | Cripto Trading & Análisis de Mercados Digitales 📈</h1>
     <p><strong>🚀 Crypto Trader & Developer</strong></p>
     <p>Welcome, I am passionate about financial markets, blockchain technology, and building automated trading strategies.</p>
     <hr>
     
-    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1000&q=80" alt="Bitcoin Image" class="img-banner" onerror="this.src='BITCOIN 2.jpg'">
+    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1000&q=80" alt="Bitcoin Image" class="img-banner">
 
     <div class="section-card">
       <h3>📊 Market Interests & Expertise</h3>
       <ul>
         <li><strong>Cryptocurrencies:</strong> Bitcoin (BTC), Ethereum (ETH), and Altcoin analysis.</li>
         <li><strong>Trading Style:</strong> Algorithmic trading, technical analysis, and risk management.</li>
-        <li><strong>Tools & Tech:</strong> Python (Pandas, NumPy), Pine Script (TradingView), and Crypto Exchange APIs.</li>
+        <li><strong>Tools & Tech:</strong> Python (Pandas, NumPy), Pine Script, and Crypto Exchange APIs.</li>
       </ul>
     </div>
 
@@ -161,7 +113,7 @@ function initDashboard() {
     </ul>
 
     <hr>
-    <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1000&q=80" alt="Trading Image" class="img-banner" onerror="this.src='trading.jpg'">
+    <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1000&q=80" alt="Trading Image" class="img-banner">
 
     <h2>📉 Conceptos Clave del Trading con Criptomonedas</h2>
     <p>El trading de criptomonedas consiste en especular sobre los movimientos de precio de los activos digitales mediante el estudio de la oferta y la demanda.</p>
@@ -223,7 +175,7 @@ function initDashboard() {
       </div>
     </div>
 
-    <!-- Chatbot Container -->
+    <!-- Chatbot Widget -->
     <button id="chat-widget-button">💬</button>
     <div id="chat-box-container">
       <div class="chat-header">
@@ -240,16 +192,12 @@ function initDashboard() {
     </div>
   `;
 
-  // Renderizar Gráficas e Iniciar Eventos
   renderCharts();
   setupEvents();
 }
 
-// ==========================================
-// 4. RENDERIZADO DE GRÁFICAS (Chart.js & ECharts)
-// ==========================================
+// 4. RENDERIZAR GRÁFICAS
 function renderCharts() {
-  // Gráfico de Líneas
   const ctx = document.getElementById('cryptoChart').getContext('2d');
   currentChart = new Chart(ctx, {
     type: 'line',
@@ -274,7 +222,6 @@ function renderCharts() {
     }
   });
 
-  // Gráfico de Barras
   const ctxBar = document.getElementById('barChart').getContext('2d');
   new Chart(ctxBar, {
     type: 'bar',
@@ -298,7 +245,6 @@ function renderCharts() {
     }
   });
 
-  // Tacómetros (ECharts)
   const buyChart = echarts.init(document.getElementById('buyGauge'));
   buyChart.setOption({
     series: [{
@@ -324,11 +270,8 @@ function renderCharts() {
   });
 }
 
-// ==========================================
-// 5. EVENTOS E INTERACTIVIDAD (CHATBOT Y TABS)
-// ==========================================
+// 5. EVENTOS CHATBOT Y BOTONES
 function setupEvents() {
-  // Pestañas para cambiar cripto
   const switchCrypto = (key, btnId) => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(btnId).classList.add('active');
@@ -343,7 +286,6 @@ function setupEvents() {
   document.getElementById('btn-eth').onclick = () => switchCrypto('eth', 'btn-eth');
   document.getElementById('btn-sol').onclick = () => switchCrypto('sol', 'btn-sol');
 
-  // Toggle Chatbot
   const chatContainer = document.getElementById('chat-box-container');
   const toggleChat = () => {
     chatContainer.style.display = (chatContainer.style.display === 'flex') ? 'none' : 'flex';
@@ -352,7 +294,6 @@ function setupEvents() {
   document.getElementById('chat-widget-button').onclick = toggleChat;
   document.getElementById('chat-close').onclick = toggleChat;
 
-  // Lógica de envíos del Chatbot
   const sendMessage = async () => {
     const input = document.getElementById('chat-input');
     const text = input.value.trim();
@@ -406,3 +347,4 @@ function appendMessage(text, sender) {
   container.appendChild(msgDiv);
   container.scrollTop = container.scrollHeight;
 }
+
